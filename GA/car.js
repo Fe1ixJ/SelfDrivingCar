@@ -1,19 +1,28 @@
 class Car{
-    constructor(x,y,width,height,controlType,maxSpeed=3,color="blue"){
+    constructor(x,y,width,height,controlType,maxSpeed=3,color="blue",damaged){
         this.x=x;
         this.y=y;
         this.width=width;
         this.height=height;
-
         this.speed=0;
         this.acceleration=0.2;
         this.maxSpeed=maxSpeed;
         this.friction=0.05;
         this.angle=0;
         this.damaged=false;
-
+        //this.useBrain=false;
+        //this.useBrain=controlType=="AI";
+/*
+        document.onkeydown=(event)=>{
+            switch(event.key){
+                case "ArrowUp":
+                    this.useBrain=controlType=="AI";
+                    break;
+            }}
+  */    //if(cars[0].speed>0){
         this.useBrain=controlType=="AI";
-
+        // }             
+      
         if(controlType!="DUMMY"){
             this.sensor=new Sensor(this);
             this.brain=new NeuralNetwork(
@@ -39,6 +48,7 @@ class Car{
             maskCtx.drawImage(this.img,0,0,this.width,this.height);
 
         }
+        
 
     }
 
@@ -62,6 +72,8 @@ class Car{
                 this.controls.reverse=outputs[3];
             }
         }
+
+        
     }
 
     #assessDamage(roadBorders,traffic){
@@ -76,7 +88,10 @@ class Car{
             }
         }
         return false;
+
+        
     }
+    
 
     #createPolygon(){
         const points=[];
@@ -104,6 +119,7 @@ class Car{
     #move(){
         if(this.controls.forward){
             this.speed+=this.acceleration;
+            
         }
         if(this.controls.reverse){
             this.speed-=this.acceleration;

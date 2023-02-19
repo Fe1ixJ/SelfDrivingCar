@@ -1,9 +1,13 @@
-//Fixa något med Start game on enter eller liknande
-//Fixa om man slår AIn så blir man bästa bilen vilket då inte visar rätt med sensorer
-//Radom gen of new cars/reusing
-//Mållinje kanske och när man krossar den sätts en tid samt spara tiden lokalt skulle varit kul
-//sätt att loga vilken generation det är man kör
+//HTML 2/3 are only for debug
 
+//Fixa något med Start game on enter eller liknande     Löser
+//Fixa om man slår AIn så blir man bästa bilen vilket då inte visar rätt med sensorer   jobbigt
+//Radom gen of new cars/reusing    Skip
+//sätt att loga vilken generation det är man kör   Skip
+document.getElementById('carCount').value = localStorage.getItem("carCount") || 1;
+document.getElementById('mutationAmount').value = localStorage.getItem("mutationAmount") || '0.5';
+document.getElementById('driver').value = localStorage.getItem("driver") || '1';
+document.getElementById('training').value = localStorage.getItem("training") || '0';
 
 const carCanvas=document.getElementById("carCanvas");
 carCanvas.width=500;
@@ -17,11 +21,13 @@ const networkCtx = networkCanvas.getContext("2d");
 const road=new Road(150,180);
 const road2=new Road(400,180);
 
-const N=2500;
-let leadingCar = 1;
-let bias2 = 0.05;
+const N= Number(document.getElementById('carCount').value);
+let leadingCar = Number(document.getElementById('driver').value);
+let bias2 = Number(document.getElementById('mutationAmount').value);
+let training2 = Number(document.getElementById('training').value);
 let amountOfCars = 25;
 let theTime = 0;
+let timerstop = 0;
 const cars=generateCars(N);
 let bestCar=cars[0];
 if(localStorage.getItem("bestBrain")){
@@ -45,19 +51,41 @@ if(localStorage.getItem("bestBrain")){
 
 let traffic=[
     new Car(road2.getLaneCenter(1),-100,30,50,"DUMMY",2,getRandomColor()),
+    /* new Car(road2.getLaneCenter(1), -100, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(0), -300, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(2), -300, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(0), -500, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(1), -500, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(1), -700, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(2), -700, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(2), -900, 30, 50, "DUMMY", 2, getRandomColor() ),
+    new Car(road2.getLaneCenter(0), -900, 30, 50, "DUMMY", 2, getRandomColor() ), */
 ];
+
 
 let point=[
 
 ];
-//Recycel after time or Bestcar/cars[0] y värde något jaddijadi
-// 600 mellan bilar
+
 let pointOfRegeneration = amountOfCars-2;
-for(let i=0;i<amountOfCars;i++){
-    //traffic.push(new Car(road.getLaneCenter(getRandomNumber()),-(100+(i*200)),30,50,"DUMMY",2,getRandomColor()));
-    //traffic.push(new Car(road.getLaneCenter(getRandomNumber()),-(100+(i*200)),30,50,"DUMMY",2,getRandomColor()));
-    traffic.push(new Car(road2.getLaneCenter(getRandomNumber()),-(300+((i)*200)),30,50,"DUMMY",2,getRandomColor()));
-    traffic.push(new Car(road2.getLaneCenter(getRandomNumber()),-(300+((i)*200)),30,50,"DUMMY",2,getRandomColor()));
+if(training2==1){
+    traffic.push(new Car(road2.getLaneCenter(1),-100, 30, 50,"DUMMY",2,getRandomColor()));
+    traffic.push(new Car(road2.getLaneCenter(0),-300, 30, 50,"DUMMY",2,getRandomColor()));
+    traffic.push(new Car(road2.getLaneCenter(2),-300, 30, 50,"DUMMY",2,getRandomColor()));
+    traffic.push(new Car(road2.getLaneCenter(0),-500, 30, 50,"DUMMY",2,getRandomColor()))
+    traffic.push(new Car(road2.getLaneCenter(1),-500, 30, 50,"DUMMY",2,getRandomColor()));
+    traffic.push(new Car(road2.getLaneCenter(1),-700, 30, 50,"DUMMY",2,getRandomColor()))
+    traffic.push(new Car(road2.getLaneCenter(2),-700, 30, 50,"DUMMY",2,getRandomColor()));
+    traffic.push(new Car(road2.getLaneCenter(2),-900, 30, 50,"DUMMY",2,getRandomColor()))
+    traffic.push(new Car(road2.getLaneCenter(0),-900, 30, 50,"DUMMY",2,getRandomColor()))
+}
+else {
+    for(let i=0;i<amountOfCars;i++){
+        traffic.push(new Car(road.getLaneCenter(getRandomNumber()),-(100+(i*200)),30,50,"DUMMY",2,getRandomColor()));
+        traffic.push(new Car(road.getLaneCenter(getRandomNumber()),-(100+(i*200)),30,50,"DUMMY",2,getRandomColor()));
+        traffic.push(new Car(road2.getLaneCenter(getRandomNumber()),-(300+((i)*200)),30,50,"DUMMY",2,getRandomColor()));
+        traffic.push(new Car(road2.getLaneCenter(getRandomNumber()),-(300+((i)*200)),30,50,"DUMMY",2,getRandomColor()));
+    } 
 }
 //SÄTTA EN STOP NÄR MAN CRASHAR
 setInterval(updateLabel,10);
@@ -65,8 +93,44 @@ animate();
 
 function updateLabel(){
     var label = document.getElementById("Timer");
-     theTime += 1;
-     label.innerHTML = 2300-theTime;
+    var label2 = document.getElementById("test");
+    var label3 = document.getElementById("test2");
+    let timerver1 = -traffic[100].y;
+    let timerver2 = -cars[0].y;
+    label3.innerHTML = cars[0].speed;
+     
+    
+    if(timerver1 < timerver2){
+         timerstop = 1;
+    } 
+    if(timerstop==1){
+        theTime = theTime;
+     }
+     else{
+        theTime += 1;
+     }
+
+     if(cars[0].damaged){
+        label.innerHTML = 0;
+    }
+    else{
+        if(theTime<2300){
+            theTimever = 2300;
+            label.innerHTML = 2300-theTime;
+            //label.innerHTML = traffic[100].y
+            //label.innerHTML = -bestCar.y;
+            //label.innerHTML = 2300-theTime;   
+        }
+        else{
+            theTime = theTimever;
+            label.innerHTML = 2300-theTime;
+            
+        }
+        //När Bilen paserar sista ledet med bilar så pausar klockan
+            //if crash then 0 points
+    }
+    
+
 
     
 }
