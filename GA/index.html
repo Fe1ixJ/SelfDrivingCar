@@ -8,8 +8,6 @@
     <div id="verticalButtons">
         <label id="Timber2"> Points </label>
         <label id="Timer">0</label>
-        <label id="test">0</label>
-        <label id="test2">0</label>
         <button onclick="save()">💾</button>
         <button onclick="discard()">🗑️</button>
         
@@ -41,8 +39,15 @@
                 <option value="1" selected>1</option>
                 <option value="10">10</option>
                 <option value="100">100</option>
+                <option value="250">250</option>
                 <option value="500">500</option>
+                <option value="750">750</option>
                 <option value="1000">1000</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000</option>
+                <option value="2250">2250</option>
                 <option value="2500">2500</option>
             </select>
         </div>
@@ -52,8 +57,8 @@
         🚗
         <select name="driver" id="driver"
             onchange="localStorage.setItem('driver',this.value)">
-            <option value="0" >0</option>
-            <option value="1" selected>1</option>
+            <option value="0" >Left</option>
+            <option value="1" selected>Right</option>
         </select>
     </div>
     <label for="driver">Driver</label>
@@ -62,14 +67,12 @@
         🚗
         <select name="training" id="training"
             onchange="localStorage.setItem('training',this.value)">
-            <option value="0" selected>0</option>
-            <option value="1">1</option>
+            <option value="0" selected>False</option>
+            <option value="1">True</option>
         </select>
     </div>
     <label for="training">Training</label>
 </div>
-
-
     <canvas id="networkCanvas"></canvas>
     <script src="visualizer.js"></script>
     <script src="network.js"></script>

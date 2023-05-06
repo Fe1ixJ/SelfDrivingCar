@@ -4,6 +4,7 @@ class Controls{
         this.left=false;
         this.right=false;
         this.reverse=false;
+        this.refresh=false;
 
         switch(type){
             case "KEYS":
@@ -29,8 +30,9 @@ class Controls{
                     break;
                 case "ArrowDown":
                     this.reverse=true;
-                    break;
+                    break;     
             }
+            
         }
         document.onkeyup=(event)=>{
             switch(event.key){

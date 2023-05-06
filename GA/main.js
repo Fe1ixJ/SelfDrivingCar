@@ -8,6 +8,13 @@ document.getElementById('carCount').value = localStorage.getItem("carCount") || 
 document.getElementById('mutationAmount').value = localStorage.getItem("mutationAmount") || '0.5';
 document.getElementById('driver').value = localStorage.getItem("driver") || '1';
 document.getElementById('training').value = localStorage.getItem("training") || '0';
+document.addEventListener('keydown', function(event) {
+    // Check if the key pressed is the R key
+    if (event.key === 'r') {
+      // Refresh the page
+      location.reload();
+    }
+  });
 
 const carCanvas=document.getElementById("carCanvas");
 carCanvas.width=500;
@@ -88,16 +95,14 @@ else {
     } 
 }
 //SÄTTA EN STOP NÄR MAN CRASHAR
-setInterval(updateLabel,10);
-animate();
+setInterval(updateLabel,60);
+
 
 function updateLabel(){
     var label = document.getElementById("Timer");
-    var label2 = document.getElementById("test");
-    var label3 = document.getElementById("test2");
     let timerver1 = -traffic[100].y;
     let timerver2 = -cars[0].y;
-    label3.innerHTML = cars[0].speed;
+
      
     
     if(timerver1 < timerver2){
@@ -135,6 +140,23 @@ function updateLabel(){
     
 }
 
+var running = true;
+var frames = 0;
+var fps, fpsInterval, startTime, currentTime,then, remainder
+
+startAnimation(45) //FPS
+
+function startAnimation(fps){
+    fpsInterval = 1000/fps;
+    then = Date.now()
+    startTime = then
+    animate();
+}
+
+
+
+
+
 function save(){
     localStorage.setItem("bestBrain",
         JSON.stringify(bestCar.brain));
@@ -169,53 +191,66 @@ function generateCars(N){
 }
 
 function animate(time){
-    for(let i=0;i<traffic.length;i++){
-        traffic[i].update(road.borders,[]);
-    }
-    for(let i=0;i<traffic.length;i++){
-        traffic[i].update(road2.borders,[]);
-    }
-    for(let i=0;i<cars.length;i++){
-        cars[i].update(road.borders,traffic);
-    }
-    for(let i=0;i<cars.length;i++){
-        cars[i].update(road2.borders,traffic);
-    }
-    bestCar=cars.find(
-        c=>c.y==Math.min(
-            ...cars.map(c=>c.y)
-        ));
 
-    carCanvas.height=window.innerHeight;
-    networkCanvas.height=window.innerHeight;
+        if (!running) {
+            return;
+        }
 
-    carCtx.save();
-
-    if(leadingCar==1){
-        carCtx.translate(0,-bestCar.y+carCanvas.height*0.7);
-    }
-    else if(leadingCar==0){
-    carCtx.translate(0,-cars[0].y+carCanvas.height*0.7);
-    }
-    
-
-    road.draw(carCtx);
-    road2.draw(carCtx);
-    for(let i=0;i<traffic.length;i++){
-        traffic[i].draw(carCtx);
-    }
-    carCtx.globalAlpha=0.1;
-    for(let i=0;i<cars.length;i++){
-        cars[i].draw(carCtx);
-    }
-    carCtx.globalAlpha=1;
-    bestCar.draw(carCtx,true);
-    cars[0].draw(carCtx,true);
-    
-
-    carCtx.restore();
-
-    networkCtx.lineDashOffset=-time/50;
-    Visualizer.drawNetwork(networkCtx,bestCar.brain);
     requestAnimationFrame(animate);
+    currentTime = Date.now()
+    remainder = currentTime - then
+
+    if (remainder > fpsInterval){
+        then = currentTime - (remainder % fpsInterval)
+
+        for(let i=0;i<traffic.length;i++){
+            traffic[i].update(road.borders,[]);
+        }
+        for(let i=0;i<traffic.length;i++){
+            traffic[i].update(road2.borders,[]);
+        }
+        for(let i=0;i<cars.length;i++){
+            cars[i].update(road.borders,traffic);
+        }
+        for(let i=0;i<cars.length;i++){
+            cars[i].update(road2.borders,traffic);
+        }
+        bestCar=cars.find(
+            c=>c.y==Math.min(
+                ...cars.map(c=>c.y)
+            ));
+    
+        carCanvas.height=window.innerHeight;
+        networkCanvas.height=window.innerHeight;
+    
+        carCtx.save();
+    
+        if(leadingCar==1){
+            carCtx.translate(0,-bestCar.y+carCanvas.height*0.7);
+        }
+        else if(leadingCar==0){
+        carCtx.translate(0,-cars[0].y+carCanvas.height*0.7);
+        }
+        
+    
+        road.draw(carCtx);
+        road2.draw(carCtx);
+        for(let i=0;i<traffic.length;i++){
+            traffic[i].draw(carCtx);
+        }
+        carCtx.globalAlpha=0.1;
+        for(let i=0;i<cars.length;i++){
+            cars[i].draw(carCtx);
+        }
+        carCtx.globalAlpha=1;
+        bestCar.draw(carCtx,true);
+        cars[0].draw(carCtx,true);
+        
+    
+        carCtx.restore();
+    
+        networkCtx.lineDashOffset=-time/50;
+        Visualizer.drawNetwork(networkCtx,bestCar.brain);
+    }
+    
 }
