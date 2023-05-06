@@ -93,11 +93,9 @@ animate();
 
 function updateLabel(){
     var label = document.getElementById("Timer");
-    var label2 = document.getElementById("test");
-    var label3 = document.getElementById("test2");
     let timerver1 = -traffic[100].y;
     let timerver2 = -cars[0].y;
-    label3.innerHTML = cars[0].speed;
+
      
     
     if(timerver1 < timerver2){
